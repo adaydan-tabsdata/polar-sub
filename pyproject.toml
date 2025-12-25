@@ -1,0 +1,29 @@
+[project]
+name = "polar-sub"
+version = "0.1.0.2"
+description = "Textual TUI for exploring Polars DataFrames with SQL filtering."
+authors = [{ name = "Your Name" }]
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+dependencies = [
+  "polars>=0.20.0",
+  "textual>=0.44.0",
+  "textual[syntax]",
+  "typer"
+]
+
+[project.optional-dependencies]
+dev = [
+  "ruff>=0.4.0",
+]
+
+[project.scripts]
+polar-sub = "polar_sub.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch]
+build = { packages = ["src/polar_sub"] }
