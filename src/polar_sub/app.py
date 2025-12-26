@@ -3,7 +3,7 @@ from __future__ import annotations
 import polars as pl
 from textual import on
 from textual.app import App, ComposeResult
-from textual.containers import Container, Vertical, VerticalScroll
+from textual.containers import Container, Grid, VerticalScroll
 from textual.reactive import reactive
 from textual.widgets import Button, DataTable, Footer
 
@@ -41,12 +41,14 @@ class Driller(App):
         padding-top: 1;
     }
     Button {
-        margin-bottom: 1 ;
         border: round;
         background: transparent;
+        min-height: 1;
+        height: auto;
     }
     #sql-container { width: 4fr; }
-    #run-button-container { width: 1fr; align-horizontal: center; }
+    #run-button-container { grid-size: 2 2; }
+    
     """
 
     filters = reactive(set(), init=False)
@@ -91,9 +93,10 @@ class Driller(App):
                     ),
                     id="sql-container",
                 ),
-                Vertical(
+                Grid(
                     Button("Run", id="run-query"),
                     Button("Reset", id="reset-query"),
+                    Button("Exit", id="exit-app"),
                     id="run-button-container",
                 ),
                 id="query-container",
@@ -114,6 +117,8 @@ class Driller(App):
             await self._run_query()
         if event.button.id == "reset-query":
             await self.action_reset_query()
+        if event.button.id == "exit-app":
+            self.exit()
 
     def _run_query(self) -> None:
         query = self.initial_query
