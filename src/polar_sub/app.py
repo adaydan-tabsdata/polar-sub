@@ -14,7 +14,7 @@ from polar_sub.core.data import (
     materialize_frame,
     sql_context_for_frame,
 )
-from polar_sub.core.sql_parser import add_filter, eq_condition
+from polar_sub.core.sql_parser import compile_sql_expression, eq_condition
 
 
 class Driller(App):
@@ -28,26 +28,30 @@ class Driller(App):
         height: 1fr;
         min-height: 9;
         align-horizontal: left;
+        width: 100%
     }
-    #sql-input { width: 1fr; min-height: 3; margin-right: 1; overflow-y: auto; }
+    #sql-input { width: 100%; min-height: 3; margin-right: 1; overflow-y: auto; }
     #status { width: 40; text-style: bold; }
     #data-container { height: 2fr}
-    #filter-modal {
-        padding: 1 2;
-        border: round $accent;
-    }
-    #filter-buttons {
-        layout: horizontal;
-        padding-top: 1;
-    }
     Button {
         border: round;
         background: transparent;
         min-height: 1;
         height: auto;
+        width: auto;           
     }
-    #sql-container { width: 4fr; }
-    #run-button-container { grid-size: 2 2; }
+    #sql-container { width: 1fr; }
+    #run-button-container { 
+        grid-size: 2 2; 
+        width: auto;
+        grid-columns: auto auto;  
+        grid-rows: auto auto;      
+        }
+    #run-button-container Button {
+    width: auto;
+    min-width: 0;
+    padding: 0 1;
+    }
     
     """
 
@@ -73,6 +77,8 @@ class Driller(App):
         self.table_name = table_name
         self.ctx = sql_context_for_frame(self.base_df, table_name=table_name)
         self.initial_query = initial_query or f"SELECT * FROM {self.table_name}"
+        self.head_limit = head_limit
+        self.completed_filters = []
 
         # dynamic
         self.current_df = self.base_df
@@ -114,18 +120,22 @@ class Driller(App):
 
     async def on_button_pressed(self, event: Button.Pressed) -> None:  # type: ignore[override]
         if event.button.id == "run-query":
-            await self._run_query()
+            self._run_query()
         if event.button.id == "reset-query":
             await self.action_reset_query()
         if event.button.id == "exit-app":
             self.exit()
 
     def _run_query(self) -> None:
-        query = self.initial_query
-        for i in self.filters:
-            query = add_filter(query, i)
-            print(query)
-        self.current_query = query
+        query_input = self.query_one(QueryInput)
+        query_sql = query_input.text
+        self.current_query = query_sql
+
+        # for i in self.filters:
+        #     query = add_filter(query, i)
+        self.current_query = compile_sql_expression(self)
+        print("~")
+        print(self.current_query)
         result = self.ctx.execute(self.current_query)
         query_input = self.query_one(QueryInput)
         query_input.text = self.current_query
@@ -157,6 +167,7 @@ class Driller(App):
         query_input.text = self.app.initial_query
         self.filters = set()
         self._refresh_table(self.base_df)
+        self.completed_filters = []
         self._update_status("Reset")
         self.current_df = self.base_df
 
