@@ -1,6 +1,6 @@
 [project]
 name = "polar-sub"
-version = "0.1.0.2"
+version = "0.1.0.3"
 description = "Textual TUI for exploring Polars DataFrames with SQL filtering."
 authors = [{ name = "Your Name" }]
 readme = "README.md"
@@ -10,7 +10,8 @@ dependencies = [
   "polars>=0.20.0",
   "textual>=0.44.0",
   "textual[syntax]",
-  "typer"
+  "typer",
+  "sqlglot"
 ]
 
 [project.optional-dependencies]
