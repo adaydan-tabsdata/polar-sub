@@ -69,6 +69,3 @@ def eq_condition(col: str, value):
     # everything else treat as string (adds '')
     right = exp.Literal.string(str(value))
     return exp.EQ(this=left, expression=right)
-
-
-print(eq_condition(col="test", value=5))

@@ -1,6 +1,6 @@
 [project]
 name = "polar-sub"
-version = "0.1.0.3"
+version = "0.1.0.4"
 description = "Textual TUI for exploring Polars DataFrames with SQL filtering."
 authors = [{ name = "Your Name" }]
 readme = "README.md"
